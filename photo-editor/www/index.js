@@ -37,6 +37,12 @@ document.write(`
     clear: both;
   }
 
+  #display_image {
+      max-width: inherit;
+      max-height: inherit;
+      background-position: center;
+      background-size: 80% 80%;
+  }
 
 </style>
 `);
@@ -47,23 +53,21 @@ document.write(`
 document.write(`
                 <html>
                     <body>
-                        <h2>Welcome to the WASM Photo Editor!</h2>
+                        <h2>Welcome to the Rust-WASM Photo Editor!</h2>
                     </body>
+                    <div id="display_image" />
                     <div class="row">
                         <div class="first-column" style="background-color:#aaa;">
                             <h2>Image Functions</h2>
                             <p><button type="button" id="test_btn">Add rust functions!</button></p>
-                            <p>
-                                Upload an image
-                                <input type='file' />
-                            </p>
                         </div>
-                        <div class="second-column" style="background-color:#bbb;">
-                            <h2>Column 2</h2>
-                            <p>Some text..</p>
+                        <div class="second-column">
+                            <input type="file" id="image_input" accept="image/jpg, image/png">
+                            <div id="display_image">
                         </div>
                     </div>
-                </html>`);
+                </html>
+`);
 
 /** 
  * In this section, we add all of our event listeners for the various buttons on the page (janky, but easiest due to the way our setup is...)
@@ -86,19 +90,17 @@ function print_console() {
 }
 
 /**
- * 
+ * This section is for the image upload
  */
-window.addEventListener('load', function() {
-    document.querySelector('input[type="file"]').addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            console.log('here');
-            var img = document.querySelector('img');
-            img.onload = () => {
-                URL.revokeObjectURL(img.src);  // no longer needed, free memory
-            }
-  
-            img.src = URL.createObjectURL(this.files[0]); // set src to blob url
-            console.log(img);
-        }
+const image_input = document.querySelector("#image_input");
+
+image_input.addEventListener("change", function () {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+        const uploaded_image = reader.result;
+        // Send the base64 encoded string to rust so we can use it
+        wasm.set_img_bytes(uploaded_image);
+        document.querySelector("#display_image").style.backgroundImage = `url(${uploaded_image})`;
     });
-  });
+    reader.readAsDataURL(this.files[0]);
+});
