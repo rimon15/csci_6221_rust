@@ -13,7 +13,8 @@ mod filters;
 
 use wasm_bindgen::prelude::*;
 use web_sys::console;
-use base64::{decode, encode};
+use base64::decode;
+use image::DynamicImage::ImageRgba8;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -29,20 +30,31 @@ pub struct Photo {
     height: u32,
 }
 
-// Define our functions which will be visible to the JS code here using the wasm_bindgen attribute
+/// Called when a new image is uploaded, this function sets the current image as a pixel array
+/// @return a Photo variable pointer to JS
 #[wasm_bindgen]
-pub fn console_log() -> u8 {
-    console::log_1(&"Hello".into());
-    return 10;
+pub fn set_img_bytes(base64: &str) -> Photo {
+    utils::set_panic_hook(); // Sets the error message to actually be useful
+    let vec64: Vec<u8> = decode(base64).unwrap();
+    let img = image::load_from_memory(vec64.as_slice()).unwrap();
+
+    Photo {
+        pixels: ImageRgba8(img.to_rgba8()).as_bytes().to_vec(),
+        width: img.width(),
+        height: img.height()
+    }
 }
 
+/// Applies the grayscale filter to the image
+/// @param photo [in] the photo to convert to grayscale
+/// @return the base64 encoded image with grayscale applied
 #[wasm_bindgen]
-impl Photo {
-    /// Decodes a base64 string image to its pixel array representation (int)
-    /// @param bytes [in] the base64 encoded string
-    #[wasm_bindgen]
-    pub fn set_img_bytes(bytes: &str) {
-        let b64_vec: Vec<u8> = decode(bytes).unwrap();
-        console::log_1(&bytes.into());
-    }
+pub fn to_grayscale(photo: &Photo) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    filters::grayscale(&mut tmp);
+    utils::photo_to_base64(&tmp)
 }

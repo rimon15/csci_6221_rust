@@ -7,6 +7,9 @@
 
 import * as wasm from "photo_editor";
 
+// The variable holding the rust Photo struct image after uploaded
+var photo_ptr = null;
+
 /**
  * First, we write the CSS style for our page
  */
@@ -59,7 +62,7 @@ document.write(`
                     <div class="row">
                         <div class="first-column" style="background-color:#aaa;">
                             <h2>Image Functions</h2>
-                            <p><button type="button" id="test_btn">Add rust functions!</button></p>
+                            <p><button type="button" id="grayscale_btn">Grayscale (Desaturation)</button></p>
                         </div>
                         <div class="second-column">
                             <input type="file" id="image_input" accept="image/jpg, image/png">
@@ -72,7 +75,7 @@ document.write(`
 /** 
  * In this section, we add all of our event listeners for the various buttons on the page (janky, but easiest due to the way our setup is...)
  */
-document.getElementById("test_btn").addEventListener("click", print_console);
+document.getElementById("grayscale_btn").addEventListener("click", conv_gray);
 
 
 /**
@@ -80,14 +83,12 @@ document.getElementById("test_btn").addEventListener("click", print_console);
  * the rust wasm code to execute the commands (and perform any other JS actions such as image rendering, etc...)
  */
 
-/**
- * Just an example function. Runs a wasm function, and also gets a return value from it, this is basically what we'll be doing
- * throughout the project I think
- */
-function print_console() {
-    var a = wasm.console_log();
-    console.log(a);
+function conv_gray() {
+    let new_img = wasm.to_grayscale(photo_ptr);
+    console.log(new_img);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
 }
+
 
 /**
  * This section is for the image upload
@@ -96,10 +97,15 @@ const image_input = document.querySelector("#image_input");
 
 image_input.addEventListener("change", function () {
     const reader = new FileReader();
+    //wasm.set_img_bytes();
     reader.addEventListener("load", () => {
         const uploaded_image = reader.result;
-        // Send the base64 encoded string to rust so we can use it
-        wasm.set_img_bytes(uploaded_image);
+        // Get the uploaded image as a pointer in the rust-wasm so we can use it
+        if (uploaded_image) {
+            const needle = "image/png;base64,";
+            var a = uploaded_image.substring(uploaded_image.toString().indexOf(needle) + needle.length);
+            photo_ptr = wasm.set_img_bytes(a);
+        }
         document.querySelector("#display_image").style.backgroundImage = `url(${uploaded_image})`;
     });
     reader.readAsDataURL(this.files[0]);
