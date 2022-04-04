@@ -60,6 +60,20 @@ pub fn to_grayscale(photo: &Photo) -> String {
     utils::photo_to_base64(&tmp)
 }
 
+/// Applies the monochrome filter to the image
+/// @param photo [in] the photo to convert to monochrome
+/// @return the base64 encoded image with monochrome applied
+#[wasm_bindgen]
+pub fn to_monochrome(photo: &Photo, r_offset: u32, g_offset: u32, b_offset: u32) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    filters::monochrome(&mut tmp, r_offset, g_offset, b_offset);
+    utils::photo_to_base64(&tmp)
+}
+
 /// Applies the sobel filter to the image
 /// @param photo [in] the photo to get edges for
 /// @return the base64 encoded image with edges

@@ -63,6 +63,7 @@ document.write(`
                         <div class="first-column" style="background-color:#aaa;">
                             <h2>Image Functions</h2>
                             <p><button type="button" id="grayscale_btn">Grayscale (Desaturation)</button></p>
+                            <p><button type="button" id="monochrome_btn">Monochrome</button></p>
                             <p><button type="button" id="edges_btn">Detect Edges</button></p>
                         </div>
                         <div class="second-column">
@@ -77,8 +78,8 @@ document.write(`
  * In this section, we add all of our event listeners for the various buttons on the page (janky, but easiest due to the way our setup is...)
  */
 document.getElementById("grayscale_btn").addEventListener("click", conv_gray);
+document.getElementById("monochrome_btn").addEventListener("click", conv_mono);
 document.getElementById("edges_btn").addEventListener("click", detect_edges);
-
 
 /**
  * In this section, we add our interfacing functions which will be called by the buttons on the frontend, and will subsequently call
@@ -87,6 +88,11 @@ document.getElementById("edges_btn").addEventListener("click", detect_edges);
 
 function conv_gray() {
     let new_img = wasm.to_grayscale(photo_ptr);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
+}
+
+function conv_mono() {
+    let new_img = wasm.to_monochrome(photo_ptr, 50, 50, 50);
     document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
 }
 
