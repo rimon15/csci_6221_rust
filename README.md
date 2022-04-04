@@ -10,3 +10,7 @@ back end (Rust)
 
 ## first task  
 create page with button to choose a file and display the image uploaded by the user 
+
+## dev notes  
+- run wasm-pack build in photo-editor/ 
+- run npm run start in www/
