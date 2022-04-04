@@ -10,6 +10,7 @@
 
 mod utils;
 mod filters;
+mod convolutions;
 
 use wasm_bindgen::prelude::*;
 use web_sys::console;
@@ -56,5 +57,19 @@ pub fn to_grayscale(photo: &Photo) -> String {
         height: photo.height
     };
     filters::grayscale(&mut tmp);
+    utils::photo_to_base64(&tmp)
+}
+
+/// Applies the sobel filter to the image
+/// @param photo [in] the photo to get edges for
+/// @return the base64 encoded image with edges
+#[wasm_bindgen]
+pub fn get_edges(photo: &Photo) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    convolutions::edge_detection(&mut tmp);
     utils::photo_to_base64(&tmp)
 }

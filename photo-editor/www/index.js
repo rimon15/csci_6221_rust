@@ -63,6 +63,7 @@ document.write(`
                         <div class="first-column" style="background-color:#aaa;">
                             <h2>Image Functions</h2>
                             <p><button type="button" id="grayscale_btn">Grayscale (Desaturation)</button></p>
+                            <p><button type="button" id="edges_btn">Detect Edges</button></p>
                         </div>
                         <div class="second-column">
                             <input type="file" id="image_input" accept="image/jpg, image/png">
@@ -76,6 +77,7 @@ document.write(`
  * In this section, we add all of our event listeners for the various buttons on the page (janky, but easiest due to the way our setup is...)
  */
 document.getElementById("grayscale_btn").addEventListener("click", conv_gray);
+document.getElementById("edges_btn").addEventListener("click", detect_edges);
 
 
 /**
@@ -85,7 +87,11 @@ document.getElementById("grayscale_btn").addEventListener("click", conv_gray);
 
 function conv_gray() {
     let new_img = wasm.to_grayscale(photo_ptr);
-    console.log(new_img);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
+}
+
+function detect_edges() {
+    let new_img = wasm.get_edges(photo_ptr);
     document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
 }
 
