@@ -2,7 +2,6 @@ use base64::encode;
 use image::ImageBuffer;
 use image::DynamicImage::ImageRgba8;
 use image::DynamicImage;
-use image::ImageOutputFormat::Png;
 use crate::Photo;
 use std::io::Cursor;
 
@@ -28,7 +27,7 @@ pub fn photo_to_imgrgb(photo: &Photo) -> DynamicImage {
 /// @param photo [in] the photo to convert
 /// @return string containing the base64 representation of the photo
 pub fn photo_to_base64(photo: &Photo) -> String {
-    let mut img = photo_to_imgrgb(photo);
+    let img = photo_to_imgrgb(photo);
     let mut buf = Cursor::new(Vec::new());
 
     img.write_to(&mut buf, image::ImageOutputFormat::Png).unwrap();

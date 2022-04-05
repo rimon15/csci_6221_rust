@@ -9,6 +9,10 @@ import * as wasm from "photo_editor";
 
 // The variable holding the rust Photo struct image after uploaded
 var photo_ptr = null;
+// The ML model for ML functions
+var model = null;
+// The labels for the model predictions
+var labels = [];
 
 /**
  * First, we write the CSS style for our page
@@ -61,14 +65,19 @@ document.write(`
                     <div id="display_image" />
                     <div class="row">
                         <div class="first-column" style="background-color:#aaa;">
-                            <h2>Image Functions</h2>
+                            <h3>General Transformations</h3>
                             <p><button type="button" id="grayscale_btn">Grayscale (Desaturation)</button></p>
                             <p><button type="button" id="monochrome_btn">Monochrome</button></p>
                             <p><button type="button" id="edges_btn">Detect Edges</button></p>
+                            <p><button type="button" id="sharp_btn">Sharpening Filter</button></p>
+                            <h3>Machine Learning</h3>
+                            Upload Model<input type="file" id="model_input">
+                            Upload Labels<input type="file" id="label_input">
+                            <p><button type="button" id="recognition_btn">Image Recognition</button></p>
                         </div>
                         <div class="second-column">
-                            <input type="file" id="image_input" accept="image/jpg, image/png">
-                            <div id="display_image">
+                            <input type="file" id="image_input" accept="image/jpeg, image/png">
+                            <div id="img_txt">
                         </div>
                     </div>
                 </html>
@@ -80,6 +89,9 @@ document.write(`
 document.getElementById("grayscale_btn").addEventListener("click", conv_gray);
 document.getElementById("monochrome_btn").addEventListener("click", conv_mono);
 document.getElementById("edges_btn").addEventListener("click", detect_edges);
+document.getElementById("sharp_btn").addEventListener("click", sharpening);
+//document.getElementById("cartoon_btn").addEventListener("click", cartoonize);
+document.getElementById("recognition_btn").addEventListener("click", ml_recog);
 
 /**
  * In this section, we add our interfacing functions which will be called by the buttons on the frontend, and will subsequently call
@@ -101,24 +113,66 @@ function detect_edges() {
     document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
 }
 
+function sharpening() {
+    let new_img = wasm.sharpen_image(photo_ptr);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
+}
+
+function ml_recog() {
+    let img_txt = wasm.cnn_recognition(photo_ptr, model);
+    img_txt = JSON.parse(img_txt);
+    alert('This is a ' + labels[img_txt[1] - 1] + ' with confidence: ' + img_txt[0]);
+    document.querySelector('#img_txt').innerHTML = img_txt;
+}
 
 /**
- * This section is for the image upload
+ * This section is for the image/model/labels upload
  */
 const image_input = document.querySelector("#image_input");
 
 image_input.addEventListener("change", function () {
     const reader = new FileReader();
-    //wasm.set_img_bytes();
     reader.addEventListener("load", () => {
         const uploaded_image = reader.result;
         // Get the uploaded image as a pointer in the rust-wasm so we can use it
         if (uploaded_image) {
-            const needle = "image/png;base64,";
+            const needle = "base64,";
+            console.log(uploaded_image);
             var a = uploaded_image.substring(uploaded_image.toString().indexOf(needle) + needle.length);
             photo_ptr = wasm.set_img_bytes(a);
         }
         document.querySelector("#display_image").style.backgroundImage = `url(${uploaded_image})`;
+    });
+    reader.readAsDataURL(this.files[0]);
+});
+
+const model_input = document.querySelector("#model_input");
+
+model_input.addEventListener("change", function () {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+        const uploaded_model = reader.result;
+        // Get the uploaded model as a pointer in the rust-wasm so we can use it
+        if (uploaded_model) {
+            const needle = "data:application/octet-stream;base64,";
+            model = uploaded_model.substring(uploaded_model.toString().indexOf(needle) + needle.length);
+        }
+    });
+    reader.readAsDataURL(this.files[0]);
+});
+
+const label_input = document.querySelector("#label_input");
+
+label_input.addEventListener("change", function () {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+        const uploaded_label = reader.result;
+        // Get the uploaded model as a pointer in the rust-wasm so we can use it
+        if (uploaded_label) {
+            var labels_str = Buffer.from(uploaded_label, 'base64').toString('ascii');
+            labels_str = labels_str.substring(labels_str.indexOf('vZ1n8') + 'vZ1n8'.length);
+            labels = labels_str.split('\n');
+        }
     });
     reader.readAsDataURL(this.files[0]);
 });

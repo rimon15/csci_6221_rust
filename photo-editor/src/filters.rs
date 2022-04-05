@@ -1,6 +1,5 @@
 use std::cmp;
 use crate::Photo;
-use web_sys::console;
 
 /// Converts the photo to grayscale using the Desaturation algorithm
 /// @param photo [in/out] the photo to convert

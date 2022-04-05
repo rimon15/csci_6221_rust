@@ -11,9 +11,9 @@
 mod utils;
 mod filters;
 mod convolutions;
+mod machine_learning;
 
 use wasm_bindgen::prelude::*;
-use web_sys::console;
 use base64::decode;
 use image::DynamicImage::ImageRgba8;
 
@@ -86,4 +86,41 @@ pub fn get_edges(photo: &Photo) -> String {
     };
     convolutions::edge_detection(&mut tmp);
     utils::photo_to_base64(&tmp)
+}
+
+/// Applies the laplacian to the image for sharpening
+/// @param photo [in] the photo to sharpen
+/// @return the base64 encoded sharpened image
+#[wasm_bindgen]
+pub fn sharpen_image(photo: &Photo) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    convolutions::sharpen(&mut tmp);
+    utils::photo_to_base64(&tmp)
+}
+
+/// Applies a Generative Adversarial Network (GAN) with a pretrained model to cartoonize the image
+/// @param photo [in] the photo to cartoonize
+/// @return the base64 encoded cartoon image
+#[wasm_bindgen]
+pub fn cartoon_gan(photo: &Photo) -> String {
+    let tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    //machine_learning::sharpen(&mut tmp);
+    utils::photo_to_base64(&tmp)
+}
+
+/// Applies a Convolutional Neural Network (CNN) with a pretrained model to recognize the image
+/// @param photo [in] the photo to cartoonize
+/// @return the base64 encoded cartoon image
+#[wasm_bindgen]
+pub fn cnn_recognition(photo: &Photo, base64: &str) -> String {
+    let model_dat: Vec<u8> = decode(base64).unwrap();
+    machine_learning::recognition(&photo, &model_dat)
 }
