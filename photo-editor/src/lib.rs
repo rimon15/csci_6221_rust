@@ -124,3 +124,32 @@ pub fn cnn_recognition(photo: &Photo, base64: &str) -> String {
     let model_dat: Vec<u8> = decode(base64).unwrap();
     machine_learning::recognition(&photo, &model_dat)
 }
+
+
+/// Applies the oceanBlue filter to the image
+/// @param photo [in] the photo to convert to ocean blue
+/// @return the base64 encoded image with ocean blue applied
+#[wasm_bindgen]
+pub fn to_oceanblue(photo: &Photo) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    filters::ocean_blue(&mut tmp);
+    utils::photo_to_base64(&tmp)
+}
+
+/// Applies the Purple filter to the image
+/// @param photo [in] the photo to convert to purple
+/// @return the base64 encoded image with purple applied
+#[wasm_bindgen]
+pub fn to_purple(photo: &Photo) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    filters::purple(&mut tmp);
+    utils::photo_to_base64(&tmp)
+}

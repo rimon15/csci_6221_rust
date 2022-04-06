@@ -50,3 +50,40 @@ pub fn monochrome(photo: &mut Photo, r_offset: u32, g_offset: u32, b_offset: u32
         photo.pixels[i + 1] = new_b;
     }
 }
+
+pub fn ocean_blue(photo: &mut Photo) {
+    for i in (0..(photo.pixels.len() - 4)).step_by(4) {
+        let r = photo.pixels[i];
+        let g = photo.pixels[i + 1];
+        let b = photo.pixels[i + 2];
+
+        // We can convert the image into gray and then apply color for a simple color overlay
+        let gray = (cmp::min(cmp::min(r, g), b) + cmp::max(cmp::max(r, g), b)) / 2;
+        let new_r =gray ;
+        let new_g = gray + 100;
+        let new_b = gray +100;
+        photo.pixels[i] = new_r;
+        photo.pixels[i + 1] = new_g;
+        photo.pixels[i + 2] = new_b;
+        
+       
+    }
+}
+pub fn purple(photo: &mut Photo) {
+    for i in (0..(photo.pixels.len() - 4)).step_by(4) {
+        let r = photo.pixels[i];
+        let g = photo.pixels[i + 1];
+        let b = photo.pixels[i + 2];
+
+        // We can convert the image into gray and then apply color for a simple color overlay
+        let gray = (cmp::min(cmp::min(r, g), b) + cmp::max(cmp::max(r, g), b)) / 2;
+        let new_r =gray +50;
+        let new_g = gray ;
+        let new_b = gray +50;
+        photo.pixels[i] = new_r;
+        photo.pixels[i + 1] = new_g;
+        photo.pixels[i + 2] = new_b;
+        
+       
+    }
+}

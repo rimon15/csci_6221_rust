@@ -68,6 +68,8 @@ document.write(`
                             <h3>General Transformations</h3>
                             <p><button type="button" id="grayscale_btn">Grayscale (Desaturation)</button></p>
                             <p><button type="button" id="monochrome_btn">Monochrome</button></p>
+                            <p><button type="button" id="ocean_blue_btn">Ocean Blue</button></p>
+                            <p><button type="button" id="purple_btn">Purple</button></p>
                             <p><button type="button" id="edges_btn">Detect Edges</button></p>
                             <p><button type="button" id="sharp_btn">Sharpening Filter</button></p>
                             <h3>Machine Learning</h3>
@@ -92,7 +94,8 @@ document.getElementById("edges_btn").addEventListener("click", detect_edges);
 document.getElementById("sharp_btn").addEventListener("click", sharpening);
 //document.getElementById("cartoon_btn").addEventListener("click", cartoonize);
 document.getElementById("recognition_btn").addEventListener("click", ml_recog);
-
+document.getElementById("ocean_blue_btn").addEventListener("click", conv_ocean_blue);
+document.getElementById("purple_btn").addEventListener("click", conv_purple);
 /**
  * In this section, we add our interfacing functions which will be called by the buttons on the frontend, and will subsequently call
  * the rust wasm code to execute the commands (and perform any other JS actions such as image rendering, etc...)
@@ -124,7 +127,15 @@ function ml_recog() {
     alert('This is a ' + labels[img_txt[1] - 1] + ' with confidence: ' + img_txt[0]);
     document.querySelector('#img_txt').innerHTML = img_txt;
 }
+function conv_ocean_blue() {
+    let new_img = wasm.to_oceanblue(photo_ptr, 50, 50, 50);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
+}
 
+function conv_purple() {
+    let new_img = wasm.to_purple(photo_ptr, 50, 50, 50);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
+}
 /**
  * This section is for the image/model/labels upload
  */
