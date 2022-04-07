@@ -14,3 +14,9 @@ create page with button to choose a file and display the image uploaded by the u
 ## dev notes  
 - run wasm-pack build in photo-editor/ 
 - run npm run start in www/
+
+## Machine Learning
+For image recognition
+- upload the model (.pb) file in the models folder
+- upload the label file in the models folder
+- CLick image recognition
