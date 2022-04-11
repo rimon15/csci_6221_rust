@@ -87,3 +87,18 @@ pub fn purple(photo: &mut Photo) {
        
     }
 }
+
+/// Converts the photo to B+W by thresholding
+/// @param photo [in/out] the photo to convert
+pub fn bw_threshold(photo: &mut Photo) {
+    grayscale(photo);
+    let threshold = 30;
+    for i in (0..(photo.pixels.len() - 4)).step_by(4) {
+        let cur_gray = photo.pixels[i];
+        let bw = if cur_gray >= threshold { 255 } else { 0 };
+
+        photo.pixels[i] = bw;
+        photo.pixels[i + 1] = bw;
+        photo.pixels[i + 2] = bw;
+    }
+}

@@ -45,10 +45,11 @@ document.write(`
   }
 
   #display_image {
-      max-width: inherit;
-      max-height: inherit;
-      background-position: center;
-      background-size: 80% 80%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background-repeat-x: no-repeat;
+      background-repeat-y: no-repeat;
   }
 
 </style>
@@ -62,7 +63,6 @@ document.write(`
                     <body>
                         <h2>Welcome to the Rust-WASM Photo Editor!</h2>
                     </body>
-                    <div id="display_image" />
                     <div class="row">
                         <div class="first-column" style="background-color:#aaa;">
                             <h3>General Transformations</h3>
@@ -72,6 +72,8 @@ document.write(`
                             <p><button type="button" id="purple_btn">Purple</button></p>
                             <p><button type="button" id="edges_btn">Detect Edges</button></p>
                             <p><button type="button" id="sharp_btn">Sharpening Filter</button></p>
+                            <p><button type="button" id="thresh_btn">Thresholding</button></p>
+                            <p><button type="button" id="emboss_btn">Emboss</button></p>
                             <h3>Machine Learning</h3>
                             Upload Model<input type="file" id="model_input">
                             Upload Labels<input type="file" id="label_input">
@@ -79,7 +81,7 @@ document.write(`
                         </div>
                         <div class="second-column">
                             <input type="file" id="image_input" accept="image/jpeg, image/png">
-                            <div id="img_txt">
+                            <div id="display_image" />
                         </div>
                     </div>
                 </html>
@@ -96,6 +98,8 @@ document.getElementById("sharp_btn").addEventListener("click", sharpening);
 document.getElementById("recognition_btn").addEventListener("click", ml_recog);
 document.getElementById("ocean_blue_btn").addEventListener("click", conv_ocean_blue);
 document.getElementById("purple_btn").addEventListener("click", conv_purple);
+document.getElementById("thresh_btn").addEventListener("click", filter_thresh);
+document.getElementById("emboss_btn").addEventListener("click", conv_emboss);
 /**
  * In this section, we add our interfacing functions which will be called by the buttons on the frontend, and will subsequently call
  * the rust wasm code to execute the commands (and perform any other JS actions such as image rendering, etc...)
@@ -134,6 +138,16 @@ function conv_ocean_blue() {
 
 function conv_purple() {
     let new_img = wasm.to_purple(photo_ptr, 50, 50, 50);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
+}
+
+function filter_thresh() {
+    let new_img = wasm.to_threshold(photo_ptr);
+    document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
+}
+
+function conv_emboss() {
+    let new_img = wasm.to_emboss(photo_ptr);
     document.querySelector("#display_image").style.backgroundImage = `url(${new_img})`;
 }
 /**

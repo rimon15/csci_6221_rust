@@ -153,3 +153,31 @@ pub fn to_purple(photo: &Photo) -> String {
     filters::purple(&mut tmp);
     utils::photo_to_base64(&tmp)
 }
+
+/// Applies thresholding to the image
+/// @param photo [in] the photo to convert to threshold
+/// @return the base64 encoded image with thresholding applied
+#[wasm_bindgen]
+pub fn to_threshold(photo: &Photo) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    filters::bw_threshold(&mut tmp);
+    utils::photo_to_base64(&tmp)
+}
+
+/// Applies embossing filter
+/// @param photo [in] the photo to convert to emboss
+/// @return the base64 encoded image with embossing applied
+#[wasm_bindgen]
+pub fn to_emboss(photo: &Photo) -> String {
+    let mut tmp = Photo {
+        pixels: photo.pixels.clone(),
+        width: photo.width,
+        height: photo.height
+    };
+    convolutions::emboss(&mut tmp);
+    utils::photo_to_base64(&tmp)
+}
